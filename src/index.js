@@ -26,6 +26,16 @@ app.get('/getusers',async(req,res)=>{
     res.send(getDbUser)
 })
 
+app.put('/user/:id', async(req,res, next)=>{
+    try {
+       const userData = req.body
+
+       editUserdata(parseInt(userData.cedula), userData.nombre, userData.apellido, userData.clave, userData.correo, userData.telefono)
+    } catch (error) {
+        
+    }
+})
+
 app.delete("/user/:id", async(req, res, next)=>{
     try {
         let {id}= req.params
@@ -138,4 +148,42 @@ const deleteDataUser = async (id)=>{
     console.log(res.rows) 
     return res.rows
     
+}
+
+const editUserdata = async (cedula, nombre, apellido, clave, correo, telefono)=>{
+
+    //conexion a la base de datos de la nube
+    const client = new Client({
+        user: 'mnfoipfwoxjrgd',
+        host: 'ec2-3-225-213-67.compute-1.amazonaws.com',
+        database: 'ddttcmfu63aenk',
+        password: 'd42756a53b865008755e09cc190e2f0741008b46aa597cb2cac94a9a0d362d20',
+        port: 5432,
+        ssl:{
+            rejectUnauthorized: false,
+        }
+      })
+    await client.connect()
+
+    //creando query para insertar datos
+
+    const edit = 
+    "UPDATE usuarios SET'"+
+    cedula+
+    "','"+ 
+    nombre +
+    "','"+ 
+    apellido +
+    "','"+ 
+    clave +
+    "','"+ 
+    correo +
+    "','"+ 
+    telefono +
+    "' WHERE '"+cedula+"'"
+
+     console.log(`executing query: ${edit}`);
+    const res = await client.query(edit)
+    console.log(res.rows) // Hello world!
+    await client.end()
 }
